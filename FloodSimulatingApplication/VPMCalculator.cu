@@ -217,13 +217,3 @@ __global__ void WaterHeightChangeByDrain(double* waterHeight, double* drainRate,
 	else
 		waterHeight[idx] = newWaterHeight;
 }
-
-__global__ void SetOne(double* A, const size_t sizeX, const size_t sizeY)
-{
-	int ix = threadIdx.x + blockIdx.x * blockDim.x;
-	int iy = threadIdx.y + blockIdx.y * blockDim.y;
-	int idx = iy * sizeX + ix;
-	if (ix >= sizeX || iy >= sizeY)
-		return;
-	A[idx] += 1.0;
-}

@@ -20,6 +20,16 @@ size_t Model::GetSizeY() const
     return this->sizeY;
 }
 
+void Model::SetDeltaX(const double deltaX)
+{
+    this->deltaX = deltaX;
+}
+
+double Model::GetDeltaX() const
+{
+    return this->deltaX;
+}
+
 void Model::SetDeltaT(const double deltaT)
 {
     this->deltaT = deltaT;
@@ -48,4 +58,24 @@ void Model::SetWaterHeight(const vector<double> waterHeight)
 vector<double> Model::GetWaterHeight() const
 {
     return this->waterHeight;
+}
+
+void Model::SetDamHeight(const vector<double> damHeight)
+{
+    this->damHeight = damHeight;
+}
+
+vector<double> Model::GetDamHeight() const
+{
+    return this->damHeight;
+}
+
+void Model::SetDrainRate(const vector<double> drainRate)
+{
+    this->drainRate = drainRate;
+}
+
+vector<double> Model::GetDrainRate() const
+{
+    return this->drainRate;
 }

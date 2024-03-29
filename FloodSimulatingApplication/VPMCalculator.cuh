@@ -12,5 +12,3 @@ __global__ void UpdateNewFlowField(FlowField* flowField, FlowField* newFlowField
 __global__ void UpdateWaterVelocityAndHeight(double* waterHeight, Vec2* waterVelocity, FlowField* flowField, size_t sizeX, size_t sizeY, double deltaT, double pipeLength);
 __global__ void Evaporation(double* waterHeight, size_t sizeX, size_t sizeY, double Ke, double deltaT);
 __global__ void WaterHeightChangeByDrain(double* waterHeight, double* drainRate, size_t sizeX, size_t sizeY, double deltaT);
-
-__global__ void SetOne(double* A, const size_t sizeX, const size_t sizeY);

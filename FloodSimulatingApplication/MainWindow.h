@@ -30,14 +30,18 @@ public slots:
 private:
     Ui::MainWindowClass ui;
     int currentStep = 0;
-    QLabel* labelStatus = nullptr;
-    QTimer* timer = nullptr;
-    Project project;
+    int pixmapWidth = 0;
+    int pixmapHeight = 0;
 
+    QLabel* labelStatus = nullptr;
+    QLabel* labelFPS = nullptr;
+
+    QTimer* timer = nullptr;
     QAction* actionLoad = nullptr;
     QAction* actionStart = nullptr;
     QAction* actionPause = nullptr;
 
+    Project project;
     cv::Mat terrainImg = cv::Mat::zeros(1, 1, CV_8UC3);
     cv::Mat waterImg = cv::Mat::zeros(1, 1, CV_8UC3);
     cv::Mat blendedImg = cv::Mat::zeros(1, 1, CV_8UC3);

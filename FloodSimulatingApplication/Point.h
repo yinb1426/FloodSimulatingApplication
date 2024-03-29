@@ -1,8 +1,17 @@
 #pragma once
+
+/**
+ * @brief 点类
+ * 使用类模版的坐标点类
+ * 类成员：
+ *     1. x
+ *     2. y
+ */
+
 template <class T>
 class Point
 {
-protected:
+private:
 	T x, y;
 
 public:

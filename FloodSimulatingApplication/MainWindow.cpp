@@ -55,12 +55,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui.labelImage->setStyleSheet("background-color: white;");
     ui.labelImage->setAlignment(Qt::AlignCenter);
     setCentralWidget(ui.labelImage);
-    //ui.labelImage->setScaledContents(true);
 
     timer = new QTimer(this);
 
     labelStatus = new QLabel("", this);
     ui.statusBar->addWidget(labelStatus);
+    labelFPS = new QLabel("", this);
+    ui.statusBar->addPermanentWidget(labelFPS);
 
     connect(actionLoad, &QAction::triggered, this, &MainWindow::ActionLoadTriggered);
     connect(actionStart, &QAction::triggered, this, &MainWindow::ActionStartTriggered);
@@ -79,6 +80,7 @@ void MainWindow::ActionLoadTriggered()
 
     size_t sizeX = 1405;
     size_t sizeY = 790;
+    size_t deltaX = 15;
 
     cv::Mat terrainHeightTif = cv::imread("resource/heightmap/FangshanTestArea.tif", cv::IMREAD_UNCHANGED);
     cv::Mat rainfallRateTif = cv::imread("resource/heightmap/RainData_0.tif", cv::IMREAD_UNCHANGED);
@@ -91,7 +93,7 @@ void MainWindow::ActionLoadTriggered()
     vector<double> zeros(sizeX * sizeY);
     vector<Vec3> zerosVec3(sizeX * sizeY);
 
-    VPM fs = VPM(sizeX, sizeY, terrainHeight, zeros, zeros, riverDepth, rainfallRate, zeros, zerosVec3);
+    VPM fs = VPM(sizeX, sizeY, deltaX, terrainHeight, zeros, zeros, riverDepth, rainfallRate, zeros, zerosVec3);
     project = Project(std::make_shared<VPM>(fs));
 
     terrainImg = GetImage(fs.GetTerrainHeight(), fs.GetSizeX(), fs.GetSizeY(), cv::COLORMAP_JET, 0);
@@ -129,14 +131,24 @@ void MainWindow::RunSimulation()
     if (currentStep % 100 == 0)
         labelStatus->setText("Step: " + QString::number(currentStep));
 
+    clock_t start = clock();
+
     project.RunSimulationOneStep(currentStep++);
     project.GetResult();
 
     waterImg = GetImage(project.GetWaterHeight(), project.GetModel()->GetSizeX(), project.GetModel()->GetSizeY(), cv::COLORMAP_BONE, 1);
     cv::addWeighted(terrainImg, 0.45, waterImg, 0.55, 2.8, blendedImg);
     QImage img((uchar*)blendedImg.data, blendedImg.cols, blendedImg.rows, blendedImg.cols * 3, QImage::Format_RGB888);
-    ui.labelImage->setPixmap(QPixmap::fromImage(img).scaled(ui.labelImage->size(), Qt::KeepAspectRatio, Qt::FastTransformation));
+    QPixmap pixmap = QPixmap::fromImage(img).scaled(ui.labelImage->size(), Qt::KeepAspectRatio, Qt::FastTransformation);
+    ui.labelImage->setPixmap(pixmap);
     ui.labelImage->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+
+    clock_t end = clock();
+
+    pixmapWidth = pixmap.size().width();
+    pixmapHeight = pixmap.size().height();
+
+    labelFPS->setText("FPS: " + QString::number(CLOCKS_PER_SEC / (double)(end - start), 'f', 2));
 }
 
 
