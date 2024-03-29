@@ -108,12 +108,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="PainterWidget.cpp" />
     <ClCompile Include="Project.cpp" />
     <QtRcc Include="MainWindow.qrc" />
     <QtUic Include="MainWindow.ui" />
     <QtMoc Include="MainWindow.h" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="main.cpp" />
+    <QtUic Include="PainterWidget.ui" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="VirtualPipelineModel.cu" />
@@ -123,6 +125,7 @@
     <ClInclude Include="Dam.h" />
     <ClInclude Include="Drain.h" />
     <ClInclude Include="Model.h" />
+    <QtMoc Include="PainterWidget.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Project.h" />
     <ClInclude Include="Utils.h" />

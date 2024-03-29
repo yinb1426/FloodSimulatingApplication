@@ -3,11 +3,15 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_MainWindow.h"
 #include "Project.h"
+#include "PainterWidget.h"
 
 #include <opencv2/opencv.hpp>  
 #include <opencv2/core/core.hpp>  
 #include <opencv2/highgui/highgui.hpp>  
 #include <opencv2/imgproc.hpp>  
+
+#include <QMouseEvent>
+#include <QResizeEvent>
 
 class MainWindow : public QMainWindow
 {
@@ -24,22 +28,30 @@ public slots:
     void ActionLoadTriggered();
     void ActionStartTriggered();
     void ActionPauseTriggered();
+    void ActionDrawingDamTriggered();
+
+    void resizeEvent(QResizeEvent* event);
+
     void StartTimer(bool flag);
     void RunSimulation();
 
 private:
     Ui::MainWindowClass ui;
+    PainterWidget painterWidget;
+
     int currentStep = 0;
     int pixmapWidth = 0;
     int pixmapHeight = 0;
 
     QLabel* labelStatus = nullptr;
     QLabel* labelFPS = nullptr;
+    QImage img;
 
     QTimer* timer = nullptr;
     QAction* actionLoad = nullptr;
     QAction* actionStart = nullptr;
     QAction* actionPause = nullptr;
+    QAction* actionDrawingDam = nullptr;
 
     Project project;
     cv::Mat terrainImg = cv::Mat::zeros(1, 1, CV_8UC3);

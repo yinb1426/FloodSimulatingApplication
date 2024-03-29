@@ -52,6 +52,13 @@ MainWindow::MainWindow(QWidget *parent)
     group->addAction(actionPause);
     ui.mainToolBar->addAction(actionPause);    
 
+    actionDrawingDam = new QAction("Drawing Dam", ui.mainToolBar);
+    actionDrawingDam->setEnabled(false);
+    actionDrawingDam->setCheckable(true);
+    actionDrawingDam->setChecked(false);
+    group->addAction(actionDrawingDam);
+    ui.mainToolBar->addAction(actionDrawingDam);
+
     ui.labelImage->setStyleSheet("background-color: white;");
     ui.labelImage->setAlignment(Qt::AlignCenter);
     setCentralWidget(ui.labelImage);
@@ -66,8 +73,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(actionLoad, &QAction::triggered, this, &MainWindow::ActionLoadTriggered);
     connect(actionStart, &QAction::triggered, this, &MainWindow::ActionStartTriggered);
     connect(actionPause, &QAction::triggered, this, &MainWindow::ActionPauseTriggered);
-    connect(this, SIGNAL(IsStarted(bool)), this, SLOT(StartTimer(bool)));
+    connect(actionDrawingDam, &QAction::triggered, this, &MainWindow::ActionDrawingDamTriggered);
 
+    connect(this, SIGNAL(IsStarted(bool)), this, SLOT(StartTimer(bool)));
     connect(timer, SIGNAL(timeout()), this, SLOT(RunSimulation()));
 
 }
@@ -77,6 +85,7 @@ void MainWindow::ActionLoadTriggered()
     actionLoad->setEnabled(false);
     actionStart->setEnabled(true);
     actionPause->setEnabled(true);
+    actionDrawingDam->setEnabled(true);
 
     size_t sizeX = 1405;
     size_t sizeY = 790;
@@ -118,6 +127,21 @@ void MainWindow::ActionPauseTriggered()
     emit IsStarted(false);
 }
 
+void MainWindow::ActionDrawingDamTriggered()
+{
+    timer->stop();
+    painterWidget.SetImage(QImage((uchar*)terrainImg.data, terrainImg.cols, terrainImg.rows, terrainImg.cols * 3, QImage::Format_RGB888));
+    painterWidget.SetLabelImage();
+    painterWidget.show();
+}
+
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+    QPixmap pixmap = QPixmap::fromImage(img).scaled(ui.labelImage->size(), Qt::KeepAspectRatio, Qt::FastTransformation);
+    ui.labelImage->setPixmap(pixmap);
+    ui.labelImage->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+}
+
 void MainWindow::StartTimer(bool flag)
 {
     if (flag)
@@ -138,7 +162,7 @@ void MainWindow::RunSimulation()
 
     waterImg = GetImage(project.GetWaterHeight(), project.GetModel()->GetSizeX(), project.GetModel()->GetSizeY(), cv::COLORMAP_BONE, 1);
     cv::addWeighted(terrainImg, 0.45, waterImg, 0.55, 2.8, blendedImg);
-    QImage img((uchar*)blendedImg.data, blendedImg.cols, blendedImg.rows, blendedImg.cols * 3, QImage::Format_RGB888);
+    img = QImage((uchar*)blendedImg.data, blendedImg.cols, blendedImg.rows, blendedImg.cols * 3, QImage::Format_RGB888);
     QPixmap pixmap = QPixmap::fromImage(img).scaled(ui.labelImage->size(), Qt::KeepAspectRatio, Qt::FastTransformation);
     ui.labelImage->setPixmap(pixmap);
     ui.labelImage->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -161,4 +185,5 @@ MainWindow::~MainWindow()
     delete actionLoad;
     delete actionStart;
     delete actionPause;
+    delete actionDrawingDam;
 }
