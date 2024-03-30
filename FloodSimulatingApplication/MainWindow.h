@@ -23,17 +23,21 @@ public:
 
 signals:
     void IsStarted(bool flag);
+    void PainterTypeSelected(PainterWidget::PainterType);
 
 public slots:
     void ActionLoadTriggered();
     void ActionStartTriggered();
     void ActionPauseTriggered();
     void ActionDrawingDamTriggered();
+    void ActionDrawingDrainTriggered();
+    void ActivatePainterWidget(PainterWidget::PainterType type);
 
     void resizeEvent(QResizeEvent* event);
 
     void StartTimer(bool flag);
     void RunSimulation();
+    void SaveDrainList(QList<QPoint> posList);
 
 private:
     Ui::MainWindowClass ui;
@@ -51,6 +55,7 @@ private:
     QAction* actionLoad = nullptr;
     QAction* actionStart = nullptr;
     QAction* actionPause = nullptr;
+    QAction* actionDrawingDrain = nullptr; 
     QAction* actionDrawingDam = nullptr;
 
     Project project;

@@ -52,6 +52,13 @@ MainWindow::MainWindow(QWidget *parent)
     group->addAction(actionPause);
     ui.mainToolBar->addAction(actionPause);    
 
+    actionDrawingDrain = new QAction("Drawing Drain", ui.mainToolBar);
+    actionDrawingDrain->setEnabled(false);
+    actionDrawingDrain->setCheckable(true);
+    actionDrawingDrain->setChecked(false);
+    group->addAction(actionDrawingDrain);
+    ui.mainToolBar->addAction(actionDrawingDrain);
+
     actionDrawingDam = new QAction("Drawing Dam", ui.mainToolBar);
     actionDrawingDam->setEnabled(false);
     actionDrawingDam->setCheckable(true);
@@ -73,11 +80,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(actionLoad, &QAction::triggered, this, &MainWindow::ActionLoadTriggered);
     connect(actionStart, &QAction::triggered, this, &MainWindow::ActionStartTriggered);
     connect(actionPause, &QAction::triggered, this, &MainWindow::ActionPauseTriggered);
+    connect(actionDrawingDrain, &QAction::triggered, this, &MainWindow::ActionDrawingDrainTriggered);
     connect(actionDrawingDam, &QAction::triggered, this, &MainWindow::ActionDrawingDamTriggered);
 
     connect(this, SIGNAL(IsStarted(bool)), this, SLOT(StartTimer(bool)));
     connect(timer, SIGNAL(timeout()), this, SLOT(RunSimulation()));
-
+    connect(this, SIGNAL(PainterTypeSelected(PainterWidget::PainterType)), this, SLOT(ActivatePainterWidget(PainterWidget::PainterType)));
+    connect(&painterWidget, SIGNAL(SendDrainPosList(QList<QPoint>)), this, SLOT(SaveDrainList(QList<QPoint>)));
 }
 
 void MainWindow::ActionLoadTriggered()
@@ -85,6 +94,7 @@ void MainWindow::ActionLoadTriggered()
     actionLoad->setEnabled(false);
     actionStart->setEnabled(true);
     actionPause->setEnabled(true);
+    actionDrawingDrain->setEnabled(true);
     actionDrawingDam->setEnabled(true);
 
     size_t sizeX = 1405;
@@ -129,7 +139,17 @@ void MainWindow::ActionPauseTriggered()
 
 void MainWindow::ActionDrawingDamTriggered()
 {
+    emit PainterTypeSelected(PainterWidget::Dam);
+}
+void MainWindow::ActionDrawingDrainTriggered()
+{
+    emit PainterTypeSelected(PainterWidget::Drain);
+}
+
+void MainWindow::ActivatePainterWidget(PainterWidget::PainterType type)
+{
     timer->stop();
+    painterWidget.SetPainterType(type);
     painterWidget.SetImage(QImage((uchar*)terrainImg.data, terrainImg.cols, terrainImg.rows, terrainImg.cols * 3, QImage::Format_RGB888));
     painterWidget.SetLabelImage();
     painterWidget.show();
@@ -175,6 +195,21 @@ void MainWindow::RunSimulation()
     labelFPS->setText("FPS: " + QString::number(CLOCKS_PER_SEC / (double)(end - start), 'f', 2));
 }
 
+void MainWindow::SaveDrainList(QList<QPoint> posList)
+{
+    painterWidget.ClearPosList();
+    painterWidget.hide();
+
+    for (auto& p : posList)
+    {
+        Drain d = Drain(p.x(), p.y(), 5.0, 5.0 * project.GetModel()->GetDeltaX());
+        project.AddDrain(d);
+    }
+    project.UpdateDrainRate();  
+
+    QMessageBox message(QMessageBox::Icon::Information, "Drain Update Success", "Drain Update Success!");
+    message.exec();
+}
 
 MainWindow::~MainWindow()
 {
@@ -185,5 +220,5 @@ MainWindow::~MainWindow()
     delete actionLoad;
     delete actionStart;
     delete actionPause;
-    delete actionDrawingDam;
+    delete actionDrawingDrain;
 }

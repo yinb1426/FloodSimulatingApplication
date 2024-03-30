@@ -6,7 +6,7 @@ PainterWidget::PainterWidget(QWidget *parent)
 {
 	ui.setupUi(this);
 
-	type = PainterType::Dam;
+	type = PainterType::Drain;
 
 	QAction* actionReset = new QAction("Reset", this);
 	actionReset->setCheckable(false);
@@ -47,6 +47,16 @@ void PainterWidget::paintEvent(QPaintEvent* event)
 	ui.labelImage->setPixmap(pixmap);
 }
 
+void PainterWidget::SetPainterType(const PainterType type)
+{
+	this->type = type;
+}
+
+PainterWidget::PainterType PainterWidget::GetPainterType() const
+{
+	return this->type;
+}
+
 void PainterWidget::SetImage(const QImage img)
 {
 	this->img = img;
@@ -72,5 +82,5 @@ void PainterWidget::ClearPosList()
 
 void PainterWidget::ActionSaveTriggered()
 {
-	emit SendDamPosList(posList);
+	emit SendDrainPosList(this->posList);
 }

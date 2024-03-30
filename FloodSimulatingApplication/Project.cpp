@@ -114,7 +114,7 @@ void Project::UpdateDrainRate()
 	vector<double> raster(sizeX * model->GetSizeY());
 	for (auto& d : drainList)
 	{
-		int r = round(d.GetRadius() / ratio);
+		int r = fmax(1, round(d.GetRadius() / ratio));
 		int xc = d.GetPos().GetX(), yc = d.GetPos().GetY();
 		int x0 = 0, y0 = r;
 		int p = 1 - r;
