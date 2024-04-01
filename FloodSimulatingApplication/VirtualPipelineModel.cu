@@ -81,10 +81,12 @@ void VPM::RunSimulation(const size_t step)
 	UpdateNewFlowField << < dimGrid, dimBlock >> > (gFlowField, gNewFlowField, sizeX, sizeY);
 	UpdateWaterVelocityAndHeight << < dimGrid, dimBlock >> > (gWaterHeight, gWaterVelocity, gFlowField, sizeX, sizeY, deltaT, pipeLength);
 	//Evaporation << < dimGrid, dimBlock >> > (gWaterHeight, sizeX, sizeY, Ke, deltaT);
+	WaterHeightChangeByDrain << < dimGrid, dimBlock >> > (gWaterHeight, gDrainRate, sizeX, sizeY, deltaT);
 }
 
 void VPM::GetResultFromDevice()
 {
+	cudaMemcpy(&surfaceHeight[0], gSurfaceHeight, sizeof(double) * sizeX * sizeY, cudaMemcpyDeviceToHost);
 	cudaMemcpy(&waterHeight[0], gWaterHeight, sizeof(double) * sizeX * sizeY, cudaMemcpyDeviceToHost);
 	cudaMemcpy(&waterVelocity[0], gWaterVelocity, sizeof(Vec2) * sizeX * sizeY, cudaMemcpyDeviceToHost);
 }

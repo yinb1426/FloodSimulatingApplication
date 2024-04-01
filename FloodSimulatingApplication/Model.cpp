@@ -1,4 +1,5 @@
 #include "Model.h"
+#include <cuda_runtime.h>
 
 void Model::SetSizeX(const size_t sizeX)
 {
@@ -60,9 +61,23 @@ vector<double> Model::GetWaterHeight() const
     return this->waterHeight;
 }
 
+void Model::UpdateSurfaceHeightWithDamHeight()
+{
+    for(int i = 0; i< surfaceHeight.size(); i++)
+        surfaceHeight[i] = terrainHeight[i] + damHeight[i];
+    cudaMemcpy(gSurfaceHeight, &surfaceHeight[0], sizeof(double) * sizeX * sizeY, cudaMemcpyHostToDevice);
+}
+
+vector<double> Model::GetSurfaceHeight() const
+{
+    return this->surfaceHeight;
+}
+
 void Model::SetDamHeight(const vector<double> damHeight)
 {
     this->damHeight = damHeight;
+    UpdateSurfaceHeightWithDamHeight();
+    cudaMemcpy(gDamHeight, &damHeight[0], sizeof(double) * sizeX * sizeY, cudaMemcpyHostToDevice);
 }
 
 vector<double> Model::GetDamHeight() const
@@ -73,6 +88,7 @@ vector<double> Model::GetDamHeight() const
 void Model::SetDrainRate(const vector<double> drainRate)
 {
     this->drainRate = drainRate;
+    cudaMemcpy(gDrainRate, &drainRate[0], sizeof(double) * sizeX * sizeY, cudaMemcpyHostToDevice);
 }
 
 vector<double> Model::GetDrainRate() const

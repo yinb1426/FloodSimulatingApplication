@@ -38,6 +38,7 @@ public slots:
     void StartTimer(bool flag);
     void RunSimulation();
     void SaveDrainList(QList<QPoint> posList);
+    void SaveDamList(QList<QList<QPoint>> lineList);
 
 private:
     Ui::MainWindowClass ui;

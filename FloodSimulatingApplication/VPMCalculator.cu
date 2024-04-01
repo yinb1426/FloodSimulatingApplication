@@ -17,23 +17,6 @@ __global__ void InitFlowFields(FlowField* flowField, FlowField* newFlowField, si
 	newFlowField[idx].bottom = 0.0;
 }
 
-//__global__ void InitFlowFields(double* flowField, double* newFlowField, size_t sizeX, size_t sizeY)
-//{
-//	size_t ix = threadIdx.x + blockIdx.x * blockDim.x;
-//	size_t iy = threadIdx.y + blockIdx.y * blockDim.y;
-//	size_t idx = iy * sizeX + ix;
-//	if (idx >= sizeX * sizeY)
-//		return;
-//	flowField[0 + idx * 4] = idx * 1.0;
-//	flowField[1 + idx * 4] = idx * 1.0;
-//	flowField[2 + idx * 4] = idx * 1.0;
-//	flowField[3 + idx * 4] = idx * 1.0;
-//	newFlowField[0 + idx * 4] = idx * 1.0;
-//	newFlowField[1 + idx * 4] = idx * 1.0;
-//	newFlowField[2 + idx * 4] = idx * 1.0;
-//	newFlowField[3 + idx * 4] = idx * 1.0;
-//}
-
 __global__ void InitVelocity(Vec2* waterVelocity, size_t sizeX, size_t sizeY)
 {
 	size_t ix = threadIdx.x + blockIdx.x * blockDim.x;
@@ -144,15 +127,6 @@ __global__ void UpdateNewFlowField(FlowField* flowField, FlowField* newFlowField
 		return;
 
 	flowField[idx] = newFlowField[idx];
-
-	//flowField[idx].left   = newFlowField[idx].left;
-	//flowField[idx].right  = newFlowField[idx].right;
-	//flowField[idx].top    = newFlowField[idx].top;
-	//flowField[idx].bottom = newFlowField[idx].bottom;
-	//newFlowField[idx].left   = 0.0;
-	//newFlowField[idx].right  = 0.0;
-	//newFlowField[idx].top    = 0.0;
-	//newFlowField[idx].bottom = 0.0;
 }
 
 __global__ void UpdateWaterVelocityAndHeight(double* waterHeight, Vec2* waterVelocity, FlowField* flowField, size_t sizeX, size_t sizeY,
@@ -211,7 +185,7 @@ __global__ void WaterHeightChangeByDrain(double* waterHeight, double* drainRate,
 		return;
 
 	double oldWaterHeight = waterHeight[idx];
-	double newWaterHeight = oldWaterHeight + deltaT * drainRate[idx];
+	double newWaterHeight = oldWaterHeight + deltaT * drainRate[idx] / 6.0;
 	if (newWaterHeight < 0.00005)
 		waterHeight[idx] = 0.0;
 	else

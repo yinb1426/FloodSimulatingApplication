@@ -33,12 +33,14 @@ public:
 
 	void SetLabelImage();
 	void ClearPosList();
+	void ClearLineList();
 
 public slots:
 	void ActionSaveTriggered();
 
 signals:
 	void SendDrainPosList(QList<QPoint>);
+	void SendDamPosList(QList<QList<QPoint>>);
 
 private:
 	Ui::PainterWidgetClass ui;	
@@ -47,5 +49,5 @@ private:
 
 	PainterType type;
 	QList<QPoint> posList;
-
+	QList<QList<QPoint>> lineList;
 };

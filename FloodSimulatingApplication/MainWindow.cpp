@@ -87,6 +87,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(timer, SIGNAL(timeout()), this, SLOT(RunSimulation()));
     connect(this, SIGNAL(PainterTypeSelected(PainterWidget::PainterType)), this, SLOT(ActivatePainterWidget(PainterWidget::PainterType)));
     connect(&painterWidget, SIGNAL(SendDrainPosList(QList<QPoint>)), this, SLOT(SaveDrainList(QList<QPoint>)));
+    connect(&painterWidget, SIGNAL(SendDamPosList(QList<QList<QPoint>>)), this, SLOT(SaveDamList(QList<QList<QPoint>>)));
+
 }
 
 void MainWindow::ActionLoadTriggered()
@@ -141,6 +143,7 @@ void MainWindow::ActionDrawingDamTriggered()
 {
     emit PainterTypeSelected(PainterWidget::Dam);
 }
+
 void MainWindow::ActionDrawingDrainTriggered()
 {
     emit PainterTypeSelected(PainterWidget::Drain);
@@ -180,6 +183,8 @@ void MainWindow::RunSimulation()
     project.RunSimulationOneStep(currentStep++);
     project.GetResult();
 
+    terrainImg = GetImage(project.GetModel()->GetSurfaceHeight(), project.GetModel()->GetSizeX(), project.GetModel()->GetSizeY(), cv::COLORMAP_JET, 0);
+    cv::cvtColor(terrainImg, terrainImg, cv::COLOR_BGR2RGB);
     waterImg = GetImage(project.GetWaterHeight(), project.GetModel()->GetSizeX(), project.GetModel()->GetSizeY(), cv::COLORMAP_BONE, 1);
     cv::addWeighted(terrainImg, 0.45, waterImg, 0.55, 2.8, blendedImg);
     img = QImage((uchar*)blendedImg.data, blendedImg.cols, blendedImg.rows, blendedImg.cols * 3, QImage::Format_RGB888);
@@ -208,6 +213,25 @@ void MainWindow::SaveDrainList(QList<QPoint> posList)
     project.UpdateDrainRate();  
 
     QMessageBox message(QMessageBox::Icon::Information, "Drain Update Success", "Drain Update Success!");
+    message.exec();
+}
+
+void MainWindow::SaveDamList(QList<QList<QPoint>> lineList)
+{
+    painterWidget.ClearPosList();
+    painterWidget.ClearLineList();
+    painterWidget.hide();
+    for (auto& line : lineList)
+    {
+        vector<Point<double>> pList;
+        for (auto& p : line)
+            pList.push_back(Point<double>(p.x(), p.y()));
+        Dam d = Dam(pList, 200);
+        project.AddDam(d);
+    }
+    project.UpdateDamHeight();
+
+    QMessageBox message(QMessageBox::Icon::Information, "Dam Update Success", "Dam Update Success!");
     message.exec();
 }
 

@@ -10,14 +10,12 @@ private:
 	double Ke;
 	size_t numRainfallLayer;
 	vector<double> buildingHeight;
-	vector<double> surfaceHeight;
 	vector<double> rainfallRate;
 	vector<Vec3> riverInflow;
 	vector<Vec2> waterVelocity;
 	vector<FlowField> flowField;
 	vector<FlowField> newFlowField;
 	double* gBuildingHeight;
-	double* gSurfaceHeight;
 	double* gRainfallRate;
 	Vec3* gRiverInflow;
 	Vec2* gWaterVelocity;
@@ -32,7 +30,6 @@ public:
 		buildingHeight(_buildingHeight), rainfallRate(_rainfallRate), riverInflow(_riverInflow)
 	{
 		numRainfallLayer = rainfallRate.size() / (_sizeX * _sizeY);
-		surfaceHeight = vector<double>(_sizeX * _sizeY);
 		waterVelocity = vector<Vec2>(_sizeX * _sizeY);
 		flowField = vector<FlowField>(_sizeX * _sizeY);
 		newFlowField = vector<FlowField>(_sizeX * _sizeY);
@@ -47,7 +44,6 @@ public:
 		gravity = 9.8;
 		Ke = 0.00001;
 		numRainfallLayer = rainfallRate.size() / (_sizeX * _sizeY);
-		surfaceHeight = vector<double>(_sizeX * _sizeY);
 		waterVelocity = vector<Vec2>(_sizeX * _sizeY);
 		flowField = vector<FlowField>(_sizeX * _sizeY);
 		newFlowField = vector<FlowField>(_sizeX * _sizeY);
